@@ -1,6 +1,6 @@
 # Pokémon Analysis
-Andreas Nikolaidis
-February 2022 - Jupyter Notebook (Link)
+##Andreas Nikolaidis
+###February 2022
 
 - [Introduction](#introduction)
 - [Exploratory Analysis](#exploratory)
