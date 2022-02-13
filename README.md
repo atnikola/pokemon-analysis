@@ -18,7 +18,7 @@ We can use this data to answer questions such as:
 
 In the following sections, I will walk through my process of extracting and analyzing the information using in ```pandas DataFrames```, creating some visualizations and perform modeling using ```scikit-learn```.
 
-## Exploratory Analysis
+## [Exploratory Analysis](#exploratory)
 Start by importing all the necessary packages into Python:
 ```python
 import numpy as np
@@ -194,7 +194,7 @@ plt.show()
 
 Seems like Gen 7's **Alola** region has a huge volume of these 'legendaries & mythical' pokemon, which after digging further into it makes perfect sense given the introduction of a plethora of legendaries called **'ultra beasts'** which were only ever introduced in that generation.
 
-## Correlations & Descriptive Statistics 
+## [Correlations & Descriptive Statistics](#descriptive)
 Let's move to explore some correlations between stats.
 
 ```python
@@ -296,7 +296,7 @@ df.describe()
 
 Looking at the summary statistics, we can see that the assumption about the variance and skewness of both plots was correct. The ‘std’ metric of the Attack is less than Defense, meaning that Defense statistics are more spread. Similarly, the Sp.Atk ‘std’ is larger than that of the Sp.Def. Skewness is determined by the positions of the median (50%) and the mean. Since in all instances (Attack, Defense, Sp.Attack and Sp.Defense) the mean is greater than the median, it is emphasised that the distribution is right-skewed (positively skewed).
 
-## Principal Component Analysis (PCA)
+# [Principal Component Analysis (PCA)](#pca)
 Let's analyze 800+ Pokemon as principal components and plot them in a two-dimensional plane using the first and second principal components.
 Principal component analysis (PCA) is a type of multivariate analysis method that is often used as a dimensionality reduction method.
 
@@ -509,7 +509,7 @@ Here we've created a histogram of clusters of pokemon that exhibit similar trait
 
 Some pokemon exhibit lots of traits similar to each other while others (like Regieleki) stand out.
     
-# Cross Validation
+# [Cross Validation & Regression Analysis](#cv-ra)
 Since we saw earlier that Special Attack is a huge contributing factor to determining whether a pokemon is classified as 'legendary', let's use the rest of the stats to see if we can predict Special Attack!
     
 ```python
@@ -592,7 +592,7 @@ pd.DataFrame(regr.coef_, index=list(df.columns[[12, 13, 14, 16, 17]])).sort_valu
 
 It seems that Special Defense & Speed are very important in predicting "Special Attack"
     
-# Conclusion
+# [Conclusion](#conclusion)
 Regression analysis, such as multiple regression analysis, uses numerical data as an explanatory variable and predicts numerical data as an objective variable. On the other hand, quantification type I predicts using non-numeric categorical data as an explanatory variable and numerical data as an objective variable. When the explanatory variables are a mixture of numerical data and categorical data, they are called extended quantification type I.
     
 We saw that Special Attack is definitely a strong predictor for determining whether a pokemon is legendary or not - and we also saw that Special Defense & Speed are also important indicators of Special Attack Value.
