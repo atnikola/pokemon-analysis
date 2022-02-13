@@ -218,6 +218,24 @@ plt.show()
 ![correlation_plot](https://user-images.githubusercontent.com/38530617/153744026-f4ad82be-09c4-4cc7-bbeb-36571a98e397.png)
 
 ```python
+from pandas import plotting
+type1 = list(set(list(df['Primary'])))
+cmap = plt.get_cmap('viridis')
+colors = [cmap((type1.index(c) + 1) / (len(type1) + 2)) for c in df['Primary'].tolist()]
+plotting.scatter_matrix(df.iloc[:, 13:18], figsize=(15, 15), color=colors, alpha=0.7) 
+plt.show()
+```
+![corrplot](https://user-images.githubusercontent.com/38530617/153744465-059f49d5-697e-43b4-b25d-b1ebdb409eba.png)
+
+```python
+import numpy as np
+pd.DataFrame(np.corrcoef(df.iloc[:, 13:18].T.values.tolist()), 
+             columns=df.iloc[:, 13:18].columns, index=df.iloc[:, 13:18].columns)
+```
+<img width="477" alt="corrplot values" src="https://user-images.githubusercontent.com/38530617/153744483-6d01ea6a-b457-4ccc-94d0-4fc2f00118cb.png">
+
+
+```python
 labels = ["Defense", "Attack"]
 dims = (11.7, 8.27) #a4
 fig, ax = plt.subplots(figsize=dims)
@@ -256,10 +274,128 @@ df.describe()
 
 Looking at the summary statistics, we can see that the assumption about the variance and skewness of both plots was correct. The ‘std’ metric of the Attack is less than Defense, meaning that Defense statistics are more spread. Similarly, the Sp.Atk ‘std’ is larger than that of the Sp.Def. Skewness is determined by the positions of the median (50%) and the mean. Since in all instances (Attack, Defense, Sp.Attack and Sp.Defense) the mean is greater than the median, it is emphasised that the distribution is right-skewed (positively skewed).
 
+## Principal Component Analysis (PCA)
+Let's analyze 800+ Pokemon as principal components and plot them in a two-dimensional plane using the first and second principal components.
+Principal component analysis (PCA) is a type of multivariate analysis method that is often used as a dimensionality reduction method.
+
+In this data, the characteristics of 800+ Pokemon are represented by **6 types** of **"observed variables"** (x1, x2, x3, x4, x5, x6). 
+These 6 variables are used as explanatory variables. 
+On the other hand, the synthetic variable synthesized by PCA is called "principal component score" and is given by a linear combination as shown in the following equation: 
+<INSERT IMG>
 
 
+In principal component analysis, the larger the ```eigenvalue``` (= variance of the principal component score), the **more important the principal component score is**.
+PCA is also sometimes regarded as a type of "unsupervised machine learning" and reveals the structure of the data itself. So let's start by importing ```PCA``` from ```Scikit-learn```
 
+```python
+from sklearn.decomposition import PCA
+pca = PCA()
+pca.fit(df.iloc[:, 13:18])
+feature = pca.transform(df.iloc[:, 13:18])
+plt.figure(figsize=(15, 15))
+plt.scatter(feature[:, 0], feature[:, 1], alpha=0.8)
+plt.xlabel('PC1')
+plt.ylabel('PC2')
+plt.grid()
+plt.show()
+```
+![PCA](https://user-images.githubusercontent.com/38530617/153744763-f3c32c09-0534-4c58-809f-e0212e10ca05.png)
 
+```python
+import matplotlib.ticker as ticker
+import numpy as np
+plt.gca().get_xaxis().set_major_locator(ticker.MaxNLocator(integer=True))
+plt.plot([0] + list( np.cumsum(pca.explained_variance_ratio_)), "-o")
+plt.xlabel("Number of principal components")
+plt.ylabel("Cumulative contribution ratio")
+plt.grid()
+plt.show()
+```
+![components](https://user-images.githubusercontent.com/38530617/153744830-3f86c909-c3de-4ff1-bbae-c0c32cd90f53.png)
+    
+Let's see if we can determine what makes a 'legendary' pokemon
+
+```python
+pca = PCA()
+pca.fit(df.iloc[:, 13:18])
+feature = pca.transform(df.iloc[:, 13:18])
+plt.figure(figsize=(15, 15))
+for binary in [True, False]:
+    plt.scatter(feature[df['is_sllm'] == binary, 0], feature[df['is_sllm'] == binary, 1], alpha=0.8, label=binary)
+plt.xlabel('PC1')
+plt.ylabel('PC2')
+plt.legend(loc = 'best')
+plt.grid()
+plt.show()
+```
+![pca_color](https://user-images.githubusercontent.com/38530617/153744885-42ed952b-05de-4f8a-a658-b6b64ba1d29d.png)
+
+Nice! Although it's not 'exact' we can clearly see that when the first principal component (PC1) reaches 50, we start to see a significantly higher concentration of legendary pokemon! Now, let's illustrate how much PC1 actually contributes to the explanatory variable (parameter) with a loading plot.
+
+![components_stats](https://user-images.githubusercontent.com/38530617/153745198-40a1fa84-cb1a-4118-a0d1-68ed7a50bb84.png)
+
+Assuming that the first principal component (PC1) is actually a strong indicator of whether or not a pokemon is classified as legendary, sub-legendary or mythical, it seems like Special Attack is the best indicator out of all stats (follow by Physical Attack)
+
+In the second principal component (PC2), Defense and Speed contribute to the opposite: Positive & Negative. 
+
+"Factor Analysis" is a method that is similar to principal component analysis.
+
+In PCA, we synthesized the "principal component" yPC1 which is a linear combination of the weight matrix (eigenvector) a for the explanatory variables. Here, define as many principal components as there are explanatory variables.
+
+yPC1 = a1,1 x1 + a1,2 x2 + a1,3 x3 + a1,4 x4 + a1,5 + ...
+
+In factor analysis, based on the idea that the explanatory variable (observed variable) x is synthesized from a latent variable called "factor", the factor score f, the weight matrix (factor load) w, and the unique factor e are specified. (There is no idea of ​​a unique factor in principal component analysis).
+
+x1 = w1,1 f1 + w1,2 f2 + e1
+
+x2 = w2,1 f1 + w2,2 f2 + e2
+
+x3 = w3,1 f1 + w3,2 f2 + e3
+
+x4 = w4,1 f1 + w4,2 f2 + e4
+
+x5 = w5,1 f1 + w5,2 f2 + e5
+
+x6 = w6,1 f1 + w6,2 f2 + e6
+
+The factor score f is a latent variable unique to each individual (sample). The linear sum of the factor score and the factor load (w1,1 f1 + w1,2 f2, etc.) is called the "common factor" and can be observed as an "observed variable" by adding it to the "unique factor" e unique to the observed variable. It's a way of thinking. The number of factors is usually smaller than the explanatory variables and must be decided in advance.
+
+(However, terms such as common factors and factors are very confusing because it seems that different people have different definitions as far as I can see)
+    
+```python
+from sklearn.decomposition import FactorAnalysis
+fa = FactorAnalysis(n_components=2, max_iter=500)
+factors = fa.fit_transform(df.iloc[:, 13:18])
+```
+
+```python
+plt.figure(figsize=(12, 12))
+for binary in [True, False]:
+    plt.scatter(factors[df['is_sllm'] == binary, 0], factors[df['is_sllm'] == binary, 1], alpha=0.8, label=binary)
+plt.xlabel("Factor 1")
+plt.ylabel("Factor 2")
+plt.legend(loc = 'best')
+plt.grid()
+plt.show()
+```
+![pca_color2](https://user-images.githubusercontent.com/38530617/153745352-7366b274-3ff8-4bbc-bd4d-327bec30f3eb.png)
+
+In this instance, the determining factor of a 'legendary' is whether or not the sum of factor 1 and factor 2 exceeds a certain level, but it seems that it is slightly biased toward the larger factor 2. So which parameters do factor 2 and factor 1 allude to?
+
+```python
+plt.figure(figsize=(8, 8))
+for x, y, name in zip(fa.components_[0], fa.components_[1], df.columns[13:18]):
+    plt.text(x, y, name)
+plt.scatter(fa.components_[0], fa.components_[1])
+plt.grid()
+plt.xlabel("Factor 1")
+plt.ylabel("Factor 2")
+plt.show()
+```
+![component_stats(factor2)](https://user-images.githubusercontent.com/38530617/153745455-4f348603-8330-4d05-a467-261ebc35c02c.png)
+
+Factor 1 highest value = "Defense"
+Factor 2 highest value = "Special Attack" 
 
 
 
