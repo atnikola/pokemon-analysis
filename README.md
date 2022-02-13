@@ -55,5 +55,18 @@ Although each stat is important in it's own right, the total value of all stats 
 df['total'] = df.HP + df.Attack + df.Defense + df.SP_Attack + df.SP_Defense + df.Speed
 ```
 
+Now let's view the range of total stats by each generation:
+```python
+plt.figure(figsize=(13,10), dpi=80)
+sns.violinplot(x='Gen', y='total', data=df, scale='width', inner='quartile', palette='Set2') 
+#palette: https://seaborn.pydata.org/tutorial/color_palettes.html?highlight=color
+
+plt.title('Violin Plot of Total Stats by Generation', fontsize=22)
+plt.show()
+```
+![2df65225-732a-4581-af16-46cbaf14b931](https://user-images.githubusercontent.com/38530617/153741822-44e70858-0ce7-436c-b649-5c172f4ce08f.png)
+
+
+
 
 
