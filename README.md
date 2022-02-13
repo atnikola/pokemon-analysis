@@ -2,14 +2,14 @@
 Andreas Nikolaidis
 February 2022 - Jupyter Notebook (Link)
 
-- [Introduction](docs/README.md/#Introduction)
-- [Exploratory Analysis](docs/README.md)
-- [Correlations & Descriptive Statistics](docs/README.md)
-- [Principal Component Analysis (PCA)](docs/README.md)
-- [Cross Validation & Regression Analysis](docs/README.md)
-- [Conclusion](docs/README.md)
+- [Introduction](#introduction)
+- [Exploratory Analysis](#exploratory)
+- [Correlations & Descriptive Statistics](#descriptive)
+- [Principal Component Analysis (PCA)](#pca)
+- [Cross Validation & Regression Analysis](#cv-ra)
+- [Conclusion](#conclusion)
 
-## Introduction
+## [Introduction](#introduction)
 In this project, I use Python to analayze stats on all Pokemon in Generations 1 - 8, and calculate some interesting statistics based on a number of factors. 
 
 We can use this data to answer questions such as:
