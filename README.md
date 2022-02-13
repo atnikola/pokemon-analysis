@@ -1,5 +1,5 @@
 # Pokémon Analysis
-**Andreas Nikolaidis**
+**Andreas Nikolaidis** 
 _February 2022_
 
 - [Introduction](#introduction)
