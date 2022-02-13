@@ -15,12 +15,13 @@ In this project, I use Python to analayze stats on all Pokemon in Generations 1 
 
 We can use this data to answer questions such as:
 - **Does a Pokemon's Type determine it's stats like: HP, Attack, Defense, etc.?**
-- **What is the most important stat for predicting other stats? i.e. which stats have a high correlation? **
+- **What is the most important stat for predicting other stats? i.e. which stats have a high correlation?**
 
 In the following sections, I will walk through my process of extracting and analyzing the information using in ```pandas DataFrames```, creating some visualizations and perform modeling using ```scikit-learn```.
 
 ## Exploratory Analysis
-```
+Start by importing all the necessary packages into Python:
+```python
 import numpy as np
 import pandas as pd
 from pandas import Series, DataFrame
@@ -39,6 +40,16 @@ sns.set_style('whitegrid')
 import sklearn
 from sklearn.linear_model import LinearRegression
 from sklearn.cluster import KMeans
+```
+
+Next we read in the excel file containing the data & check the head of the data:
+```python
+df = pd.read_excel("pokemon.xlsx")
+df.head()
+```
+Create a separate dataframe including just the necessary stats:
+```python
+df_stats = df[["Name","HP","Attack","Defense","SP_Attack","SP_Defense","Speed"]]
 ```
 
 
