@@ -51,5 +51,11 @@ Create a separate dataframe including just the necessary stats:
 ```python
 df_stats = df[["Name","HP","Attack","Defense","SP_Attack","SP_Defense","Speed"]]
 ```
+Although each stat is important in it's own right, the total value of all stats is what determines the category of a pokemon, therefore let's concatenate a column into the ```df``` that sums up the total values:
+```python
+df['total'] = df.HP + df.Attack + df.Defense + df.SP_Attack + df.SP_Defense + df.Speed
+df.columns
+```
+
 
 
