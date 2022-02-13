@@ -6,8 +6,7 @@ February 2022 - Jupyter Notebook (Link)
 - [Exploratory Analysis](docs/README.md)
 - [Correlations & Descriptive Statistics](docs/README.md)
 - [Principal Component Analysis (PCA)](docs/README.md)
-- [Cross Validation](docs/README.md)
-- [Multiple Regression Analysis](docs/README.md)
+- [Cross Validation & Regression Analysis](docs/README.md)
 - [Conclusion](docs/README.md)
 
 ## Introduction
@@ -42,7 +41,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.cluster import KMeans
 ```
 
-Next we read in the excel file containing the data & check the head of the data:
+Read Data File:
 ```python
 df = pd.read_excel("pokemon.xlsx")
 ```
@@ -157,7 +156,7 @@ As for Sub Legendaries, Legendaries and Mythical - these pokemon typically exhib
 1. Rarity: There is usually only 1 of those pokemon available in every game (some may not even be obtainable in certain games)
 2. Stats: These pokemon generally have much higher stats than the average 'regular' pokemon.
 
-Let's create a diverging bar to determine the rate at which these pokemon appear in each generation:
+Let's create a diverging bar to determine the rate at which legendary pokemon appear in each generation:
 ```python
 #Sub-Legendary, Legendary or Mythical:
 df.loc[df["is_sllm"]==False,"sllmid"] = 0
@@ -217,22 +216,6 @@ plt.show()
 ```
 ![correlation_plot](https://user-images.githubusercontent.com/38530617/153744026-f4ad82be-09c4-4cc7-bbeb-36571a98e397.png)
 
-```python
-from pandas import plotting
-type1 = list(set(list(df['Primary'])))
-cmap = plt.get_cmap('viridis')
-colors = [cmap((type1.index(c) + 1) / (len(type1) + 2)) for c in df['Primary'].tolist()]
-plotting.scatter_matrix(df.iloc[:, 13:18], figsize=(15, 15), color=colors, alpha=0.7) 
-plt.show()
-```
-![corrplot](https://user-images.githubusercontent.com/38530617/153744465-059f49d5-697e-43b4-b25d-b1ebdb409eba.png)
-
-```python
-import numpy as np
-pd.DataFrame(np.corrcoef(df.iloc[:, 13:18].T.values.tolist()), 
-             columns=df.iloc[:, 13:18].columns, index=df.iloc[:, 13:18].columns)
-```
-<img width="477" alt="corrplot values" src="https://user-images.githubusercontent.com/38530617/153744483-6d01ea6a-b457-4ccc-94d0-4fc2f00118cb.png">
 
 ```python
 p1 = sns.jointplot(x="SP_Attack",y="SP_Defense",data=df,kind="hex",color="lightgreen")
@@ -257,9 +240,22 @@ p5.fig.subplots_adjust(top=0.95)
 ![hex_orange](https://user-images.githubusercontent.com/38530617/153745779-f30e6bfc-8a29-4989-822c-cb604bbd0e98.png)
 ![hex_purple](https://user-images.githubusercontent.com/38530617/153745767-9e35d803-87a0-488b-b540-72beaeb09104.png)
 
-### Conclusion
-- Special defense affects their "Special attack" and "Defense".
-- Defense dosen't affect their speed at all.
+```python
+from pandas import plotting
+type1 = list(set(list(df['Primary'])))
+cmap = plt.get_cmap('viridis')
+colors = [cmap((type1.index(c) + 1) / (len(type1) + 2)) for c in df['Primary'].tolist()]
+plotting.scatter_matrix(df.iloc[:, 13:18], figsize=(15, 15), color=colors, alpha=0.7) 
+plt.show()
+```
+![corrplot](https://user-images.githubusercontent.com/38530617/153744465-059f49d5-697e-43b4-b25d-b1ebdb409eba.png)
+
+```python
+import numpy as np
+pd.DataFrame(np.corrcoef(df.iloc[:, 13:18].T.values.tolist()), 
+             columns=df.iloc[:, 13:18].columns, index=df.iloc[:, 13:18].columns)
+```
+<img width="477" alt="corrplot values" src="https://user-images.githubusercontent.com/38530617/153744483-6d01ea6a-b457-4ccc-94d0-4fc2f00118cb.png">
 
 ```python
 labels = ["Defense", "Attack"]
@@ -423,9 +419,180 @@ plt.show()
 Factor 1 highest value = "Defense"
 Factor 2 highest value = "Special Attack" 
 
+Let's create some charts!
+
+Firstly I created a dendrogram (dendro = greek word for tree :)) for all pokemon (Image file is way too large to display clearly)
+```python
+dfs = df.iloc[:, 13:18].apply(lambda x: (x-x.mean())/x.std(), axis=0)
+from scipy.cluster.hierarchy import linkage, dendrogram
+result1 = linkage(dfs, 
+                  metric = 'euclidean', 
+                  method = 'average')
+plt.figure(figsize=(15, 150))
+dendrogram(result1, orientation='right', labels=list(df['Name']), color_threshold=2)
+plt.title("Dedrogram of Pokemon")
+plt.xlabel("Threshold")
+plt.grid()
+plt.show()
+```
+```python
+def get_cluster_by_number(result, number):
+    output_clusters = []
+    x_result, y_result = result.shape
+    n_clusters = x_result + 1
+    cluster_id = x_result + 1
+    father_of = {}
+    x1 = []
+    y1 = []
+    x2 = []
+    y2 = []
+    for i in range(len(result) - 1):
+        n1 = int(result[i][0])
+        n2 = int(result[i][1])
+        val = result[i][2]
+        n_clusters -= 1
+        if n_clusters >= number:
+            father_of[n1] = cluster_id
+            father_of[n2] = cluster_id
+
+        cluster_id += 1
+
+    cluster_dict = {}
+    for n in range(x_result + 1):
+        if n not in father_of:
+            output_clusters.append([n])
+            continue
+
+        n2 = n
+        m = False
+        while n2 in father_of:
+            m = father_of[n2]
+            #print [n2, m]
+            n2 = m
+
+        if m not in cluster_dict:
+            cluster_dict.update({m:[]})
+        cluster_dict[m].append(n)
+
+    output_clusters += cluster_dict.values()
+
+    output_cluster_id = 0
+    output_cluster_ids = [0] * (x_result + 1)
+    for cluster in sorted(output_clusters):
+        for i in cluster:
+            output_cluster_ids[i] = output_cluster_id
+        output_cluster_id += 1
+
+    return output_cluster_ids
+```
+```python
+clusterIDs = get_cluster_by_number(result1, 50)
+print(clusterIDs)
+```
+<img width="1364" alt="cluster_ids" src="https://user-images.githubusercontent.com/38530617/153746879-35524b22-aa1a-46a0-b807-9712d474bda0.png">
+
+```python
+plt.hist(clusterIDs, bins=50)
+plt.show()
+```
+![histo](https://user-images.githubusercontent.com/38530617/153746942-f5986c3e-0267-413d-80bc-b744e84b46cd.png)
+
+Here we've created a histogram of clusters of pokemon that exhibit similar traits with each other. Here we've created 50 bins so there will be 50 different clusters of pokemon. That's quite a large number of charts to display so I'll just display several so you get the idea.
+
+![cluster4](https://user-images.githubusercontent.com/38530617/153747188-3ea042df-70b5-4972-bf44-4e3b9178be93.png)
+![cluster5](https://user-images.githubusercontent.com/38530617/153747187-01251b73-257b-4fe6-a093-2c8423980726.png)
+![cluster6](https://user-images.githubusercontent.com/38530617/153747185-05c2cf18-828c-45d2-9236-a2dad7dbf9c3.png)
+![cluster8](https://user-images.githubusercontent.com/38530617/153747184-043fe9bf-bfa7-4b48-ab16-24668a4a3f99.png)
+![cluster10](https://user-images.githubusercontent.com/38530617/153747182-e0dcd7e9-5bfc-4d70-8706-0e02c768f361.png)
+![cluster50](https://user-images.githubusercontent.com/38530617/153747180-f55a5feb-fab9-4753-a102-433b3cc19411.png)
 
 
+Some pokemon exhibit lots of traits similar to each other while others (like Regieleki) stand out.
+    
+# Cross Validation
+Since we saw earlier that Special Attack is a huge contributing factor to determining whether a pokemon is classified as 'legendary', let's use the rest of the stats to see if we can predict Special Attack!
+    
+```python
+X = df.iloc[:, 13:18]
+y = df['total']
+```
+    
+```python
+from sklearn import linear_model
+regr = linear_model.LinearRegression()
+regr.fit(X, y)
 
+print("Regression Coefficient= ", regr.coef_)
+print("Intercept= ", regr.intercept_)
+print("Coefficient of Determination= ", regr.score(X, y))
+```
 
+```python
+df.columns[[12, 13, 14, 16, 17]]
+X = df.iloc[:, [12, 13, 14, 16, 17]]
+y = df['SP_Attack']
+```
+### Cross Validation
+In machine learning, in order to evaluate performance, known data is divided into ```training``` and ```test``` data. Training (learning) is performed using training data to build a prediction model, and performance evaluation is performed based on how accurately the test data that was not used to build the prediction model can be predicted. Such an evaluation method is called "cross-validation".
 
+Training data (60% of all data)
+X_train: Explanatory variables for training data
+y_train: Objective variable for training data
+Test data (40% of all data)
+X_test: Explanatory variable for test data
+y_test: Objective variable for test data
+We aim to learn the relationship between X_train and y_train and predict y_test from X_test. If the training data seems to show good performance, but the test data not used for training has poor performance, the model is said to be "overfitted".
+    
+```python
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.4)
+```
+```python
+from sklearn import linear_model
+regr = linear_model.LinearRegression()
+regr.fit(X_train, y_train)
+print("Regression Coefficient= ", regr.coef_)
+print("Intercept= ", regr.intercept_)
+print("Coefficient of Determination(train)= ", regr.score(X_train, y_train))
+print("Coefficient of Determination(test)= ", regr.score(X_test, y_test))
+```
 
+```
+Regression Coefficient=  [ 0.15598049  0.09796333 -0.11115187  0.47986509  0.32513351]
+Intercept=  5.4684249031776915
+Coefficient of Determination(train)=  0.39594357153305826
+Coefficient of Determination(test)=  0.38127048972638855
+```
+The above values change with each calculation because the division into training data and test data is random.
+If you want to find a regression equation, you can do as above, but by standardizing the explanatory variables and objective variables and then regressing, you can find the "standard regression coefficient", which is an index of "importance of variables".
+
+```python
+Xs = X.apply(lambda x: (x-x.mean())/x.std(), axis=0)
+ys = list(pd.DataFrame(y).apply(lambda x: (x-x.mean())/x.std()).values.reshape(len(y),))
+```
+```python
+from sklearn import linear_model
+regr = linear_model.LinearRegression()
+
+regr.fit(Xs, ys)
+
+print("Regression Coefficient= ", regr.coef_)
+print("Intercept= ", regr.intercept_)
+print("Coefficient of Determination= ", regr.score(Xs, ys))
+```
+```
+Regression Coefficient=  [ 0.152545    0.11255532 -0.09718819  0.40725508  0.28208903]
+Intercept=  1.1730486200365748e-16
+Coefficient of Determination=  0.3958130072204933
+```
+```
+pd.DataFrame(regr.coef_, index=list(df.columns[[12, 13, 14, 16, 17]])).sort_values(0, ascending=False).style.bar(subset=[0])
+```
+<img width="224" alt="sp attack prediction" src="https://user-images.githubusercontent.com/38530617/153748185-68eac678-43dc-4636-98fd-ec6ed14bd448.png">
+
+It seems that Special Defense & Speed are very important in predicting "Special Attack"
+    
+# Conclusion
+Regression analysis, such as multiple regression analysis, uses numerical data as an explanatory variable and predicts numerical data as an objective variable. On the other hand, quantification type I predicts using non-numeric categorical data as an explanatory variable and numerical data as an objective variable. When the explanatory variables are a mixture of numerical data and categorical data, they are called extended quantification type I.
+
+Overall this was a way of exploring different pokemon traits and taking into account multiple factors. There's plenty more we can look into such as 'strengths', 'weaknesses' etc.. I hope you all enjoyed this, and thanks for reading all the way through!
