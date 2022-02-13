@@ -234,6 +234,32 @@ pd.DataFrame(np.corrcoef(df.iloc[:, 13:18].T.values.tolist()),
 ```
 <img width="477" alt="corrplot values" src="https://user-images.githubusercontent.com/38530617/153744483-6d01ea6a-b457-4ccc-94d0-4fc2f00118cb.png">
 
+```python
+p1 = sns.jointplot(x="SP_Attack",y="SP_Defense",data=df,kind="hex",color="lightgreen")
+p1.fig.suptitle("Hex Plot of Special Attack and Special Defense - Some Correlation")
+p1.fig.subplots_adjust(top=0.95)
+p2 = sns.jointplot(x="Defense",y="SP_Defense",data=df,kind="hex",color="lightblue")
+p2.fig.suptitle("Hex Plot of Defense and Special Defense - Some Correlation")
+p2.fig.subplots_adjust(top=0.95)
+p3 = sns.jointplot(x="SP_Attack",y="Speed",data=df,kind="hex",color="pink")
+p3.fig.suptitle("Hex Plot of Special Attack and Speed - Some Correlation")
+p3.fig.subplots_adjust(top=0.95)
+p4 = sns.jointplot(x="Attack",y="SP_Attack",data=df,kind="hex",color="orange")
+p4.fig.suptitle("Hex Plot of Attack and Special Attack - Some Correlation")
+p4.fig.subplots_adjust(top=0.95)
+p5 = sns.jointplot(x="Attack",y="Defense",data=df,kind="hex",color="purple")
+p5.fig.suptitle("Hex Plot of Attack and Defense - Some Correlation")
+p5.fig.subplots_adjust(top=0.95)
+```
+![hex_green](https://user-images.githubusercontent.com/38530617/153745763-7d378c6e-efbd-4afa-a852-2fe983ffae76.png)
+![hex_blue](https://user-images.githubusercontent.com/38530617/153745765-d36af02d-afc1-4226-8586-df5301d450eb.png)
+![hex_red](https://user-images.githubusercontent.com/38530617/153745775-e0c6e828-d52b-4758-9406-ced67a9d36b6.png)
+![hex_orange](https://user-images.githubusercontent.com/38530617/153745779-f30e6bfc-8a29-4989-822c-cb604bbd0e98.png)
+![hex_purple](https://user-images.githubusercontent.com/38530617/153745767-9e35d803-87a0-488b-b540-72beaeb09104.png)
+
+### Conclusion
+- Special defense affects their "Special attack" and "Defense".
+- Defense dosen't affect their speed at all.
 
 ```python
 labels = ["Defense", "Attack"]
