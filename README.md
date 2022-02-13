@@ -594,5 +594,7 @@ It seems that Special Defense & Speed are very important in predicting "Special 
     
 # Conclusion
 Regression analysis, such as multiple regression analysis, uses numerical data as an explanatory variable and predicts numerical data as an objective variable. On the other hand, quantification type I predicts using non-numeric categorical data as an explanatory variable and numerical data as an objective variable. When the explanatory variables are a mixture of numerical data and categorical data, they are called extended quantification type I.
+    
+We saw that Special Attack is definitely a strong predictor for determining whether a pokemon is legendary or not - and we also saw that Special Defense & Speed are also important indicators of Special Attack Value.
 
 Overall this was a way of exploring different pokemon traits and taking into account multiple factors. There's plenty more we can look into such as 'strengths', 'weaknesses' etc.. I hope you all enjoyed this, and thanks for reading all the way through!
