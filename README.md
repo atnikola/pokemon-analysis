@@ -1,6 +1,6 @@
 # Pokémon Analysis
-##Andreas Nikolaidis
-###February 2022
+## Andreas Nikolaidis
+### February 2022
 
 - [Introduction](#introduction)
 - [Exploratory Analysis](#exploratory)
