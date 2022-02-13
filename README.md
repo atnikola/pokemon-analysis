@@ -2,7 +2,7 @@
 Andreas Nikolaidis
 February 2022 - Jupyter Notebook (Link)
 
-- [Introduction](docs/Introduction.md)
+- [Introduction](docs/README.md/#Introduction)
 - [Exploratory Analysis](docs/README.md)
 - [Correlation](docs/README.md)
 - [Principal Component Analysis (PCA)](docs/README.md)
