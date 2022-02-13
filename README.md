@@ -4,7 +4,7 @@ February 2022 - Jupyter Notebook (Link)
 
 - [Introduction](docs/README.md/#Introduction)
 - [Exploratory Analysis](docs/README.md)
-- [Correlation](docs/README.md)
+- [Correlations & Descriptive Statistics](docs/README.md)
 - [Principal Component Analysis (PCA)](docs/README.md)
 - [Cross Validation](docs/README.md)
 - [Multiple Regression Analysis](docs/README.md)
@@ -168,8 +168,6 @@ sllm_ratio = df.groupby("Gen").mean()["sllmid"]
 sllm_ratio.round(4)*100
 ```
 
-
-
 ```python
 sns.set_style('darkgrid')
 df_plot = pd.DataFrame(columns={"Gen","Rate","colors"})
@@ -197,7 +195,66 @@ plt.show()
 
 Seems like Gen 7's **Alola** region has a huge volume of these 'legendaries & mythical' pokemon, which after digging further into it makes perfect sense given the introduction of a plethora of legendaries called **'ultra beasts'** which were only ever introduced in that generation.
 
+## Correlations & Descriptive Statistics 
+Let's move to explore some correlations between stats.
 
+```python
+#Correlation
+Base_stats = ['Primary','Secondary','Classification','%Male','%Female',
+              'Height','Weight','Capture_Rate','Base_Steps','HP','Attack','Defense',
+              'SP_Attack','SP_Defense','Speed','is_sllm']
+
+df_BS = df[Base_stats]
+df_BS.head()
+```
+```python
+plt.figure(figsize=(14,12))
+
+heatmap = sns.heatmap(df_BS.corr(), vmin=-1,vmax=1, annot=True, cmap='Blues')
+
+heatmap.set_title('Correlation Base Stats Heatmap', fontdict={'fontsize':15}, pad=12)
+plt.show()
+```
+![correlation_plot](https://user-images.githubusercontent.com/38530617/153744026-f4ad82be-09c4-4cc7-bbeb-36571a98e397.png)
+
+```python
+labels = ["Defense", "Attack"]
+dims = (11.7, 8.27) #a4
+fig, ax = plt.subplots(figsize=dims)
+Defhist = sns.distplot(df['Defense'],color='g', hist=True, ax=ax)
+Atthist = sns.distplot(df['Attack'],color='r', hist=True, ax=ax)
+Atthist.set(title='Distribution of Defense & Attack')
+plt.legend(labels, loc="best")
+FigHist = Atthist.get_figure()
+```
+![attack_defense](https://user-images.githubusercontent.com/38530617/153744067-1e1730c9-c360-483d-9159-45d9b53f452b.png)
+
+```python
+fig, ax = plt.subplots(2, 3, figsize=(14, 8), sharey=True)
+
+spines = ["top","right","left"]
+for i, col in enumerate(["HP", "Attack", "Defense", "SP_Attack", "SP_Defense", "Speed"]):
+    sns.kdeplot(x=col, data=df, label=col, ax=ax[i//3][i%3],
+                fill=True, color='lightblue', linewidth=2
+               )
+    
+    ax[i//3][i%3].set_xlim(-5, 250)
+    
+    for s in spines:
+        ax[i//3][i%3].spines[s].set_visible(False)
+        
+
+plt.tight_layout()
+plt.show()
+```
+![density_plots](https://user-images.githubusercontent.com/38530617/153744330-f743c4ac-a7c6-4384-a190-b83eb69c19a2.png)
+
+```python
+df.describe()
+```
+<img width="973" alt="std_dev_att_def" src="https://user-images.githubusercontent.com/38530617/153744167-f8896e9f-2a77-486b-a409-36f9bcc85d55.png">
+
+Looking at the summary statistics, we can see that the assumption about the variance and skewness of both plots was correct. The ‘std’ metric of the Attack is less than Defense, meaning that Defense statistics are more spread. Similarly, the Sp.Atk ‘std’ is larger than that of the Sp.Def. Skewness is determined by the positions of the median (50%) and the mean. Since in all instances (Attack, Defense, Sp.Attack and Sp.Defense) the mean is greater than the median, it is emphasised that the distribution is right-skewed (positively skewed).
 
 
 
