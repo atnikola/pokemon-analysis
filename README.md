@@ -1,5 +1,6 @@
 # Pokémon Analysis
 **Andreas Nikolaidis**
+
 _February 2022_
 
 - [Introduction](#introduction)
@@ -303,8 +304,8 @@ Principal component analysis (PCA) is a type of multivariate analysis method tha
 In this data, the characteristics of 800+ Pokemon are represented by **6 types** of **"observed variables"** (x1, x2, x3, x4, x5, x6). 
 These 6 variables are used as explanatory variables. 
 On the other hand, the synthetic variable synthesized by PCA is called "principal component score" and is given by a linear combination as shown in the following equation: 
-<INSERT IMG>
 
+<img width="445" alt="formula" src="https://user-images.githubusercontent.com/38530617/153749288-d9696e66-8094-401b-a9db-3a63c714d2a5.png">
 
 In principal component analysis, the larger the ```eigenvalue``` (= variance of the principal component score), the **more important the principal component score is**.
 PCA is also sometimes regarded as a type of "unsupervised machine learning" and reveals the structure of the data itself. So let's start by importing ```PCA``` from ```Scikit-learn```
