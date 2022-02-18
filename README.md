@@ -11,27 +11,25 @@ _February 2022_
 - [Conclusion](#conclusion)
 
 ## [Introduction](#introduction)
-In this project, I use Python to analayze stats on all Pokemon in Generations 1 - 8, and calculate some interesting statistics based on a number of factors. 
+In this project, I utilize Python to analayze the stats of all Pokemon in Generations 1 - 8, and calculate some interesting statistics based on a number of relevant factors that contribute to 'stength' in game. 
 
-We can use this data to answer questions such as:
-- **Does a Pokemon's Type determine it's stats like: HP, Attack, Defense, etc.?**
+With these stats we can use the data to answer questions such as:
+- **Does a Pokemon's Type determine it's stats?: HP, Attack, Defense, etc.?**
 - **What is the most important stat for predicting other stats? i.e. which stats have a high correlation?**
+- **What attributes classify a Pokemon as 'Legendary'?**
 
-In the following sections, I will walk through my process of extracting and analyzing the information using in ```pandas DataFrames```, creating some visualizations and perform modeling using ```scikit-learn```.
+In the following sections, I will walk through my process of extracting and analyzing the information using ```pandas```, creating some visualizations and modeling using ```scikit-learn```.
 
 ## [Exploratory Analysis](#exploratory)
 Start by importing all the necessary packages into Python:
 ```python
 import numpy as np
 import pandas as pd
-from pandas import Series, DataFrame
-import warnings
-warnings.filterwarnings('ignore')
 
+# Viz
 import matplotlib.pyplot as plt 
 import seaborn as sns 
 import plotly.express as px
-import plotly.graph_objects as go
 
 sns.set_style('whitegrid')
 %matplotlib inline
