@@ -105,17 +105,7 @@ plt.show()
 The **dragon type** definitely has quite a high upper interquartile range compared to other types. Meanwhile water & fairy types seem to have quite a large variance in total stats. 
 
 Let's see what the most common type of pokemon is:
-```python
-Type1 = pd.value_counts(df['Primary'])
-sns.set()
-dims = (11.7,8.27) #A4 dimensions
-fig, ax=plt.subplots(figsize=dims)
-BarT = sns.barplot(x=Type1.index, y=Type1, data=df, palette=types_color_dict, ax=ax)
-BarT.set_xticklabels(BarT.get_xticklabels(), rotation= 90, fontsize=12)
-BarT.set(ylabel = 'Freq')
-BarT.set_title('Distribution of Primary Pokemon Types')
-FigBar = BarT.get_figure()
-```
+
 ![type_distribution](https://user-images.githubusercontent.com/38530617/153743003-888b9e1b-4353-4cb8-b07f-bfd93e513c29.png)
 
 We can see that the water and normal type pokemon are the most frequently appearing 'primary' types in the game. Interesting to see Flying types as lowest however it makes sense when we only look at primary types as majority of pokemon that are dual types with Flying usually have flying as their 'secondary' type. Meaning, a Pokemon is usually never "Flying/Normal", it's always "Normal/Flying" for example. 
@@ -170,39 +160,13 @@ Base_stats = ['Primary','Secondary','Classification','%Male','%Female',
 df_BS = df[Base_stats]
 df_BS.head()
 ```
-```python
-plt.figure(figsize=(14,12))
-
-heatmap = sns.heatmap(df_BS.corr(), vmin=-1,vmax=1, annot=True, cmap='Blues')
-
-heatmap.set_title('Correlation Base Stats Heatmap', fontdict={'fontsize':15}, pad=12)
-plt.show()
-```
 ![correlation_plot](https://user-images.githubusercontent.com/38530617/153744026-f4ad82be-09c4-4cc7-bbeb-36571a98e397.png)
 
 
-```python
-p1 = sns.jointplot(x="SP_Attack",y="SP_Defense",data=df,kind="hex",color="lightgreen")
-p1.fig.suptitle("Hex Plot of Special Attack and Special Defense - Some Correlation")
-p1.fig.subplots_adjust(top=0.95)
-p2 = sns.jointplot(x="Defense",y="SP_Defense",data=df,kind="hex",color="lightblue")
-p2.fig.suptitle("Hex Plot of Defense and Special Defense - Some Correlation")
-p2.fig.subplots_adjust(top=0.95)
-p3 = sns.jointplot(x="SP_Attack",y="Speed",data=df,kind="hex",color="pink")
-p3.fig.suptitle("Hex Plot of Special Attack and Speed - Some Correlation")
-p3.fig.subplots_adjust(top=0.95)
-p4 = sns.jointplot(x="Attack",y="SP_Attack",data=df,kind="hex",color="orange")
-p4.fig.suptitle("Hex Plot of Attack and Special Attack - Some Correlation")
-p4.fig.subplots_adjust(top=0.95)
-p5 = sns.jointplot(x="Attack",y="Defense",data=df,kind="hex",color="purple")
-p5.fig.suptitle("Hex Plot of Attack and Defense - Some Correlation")
-p5.fig.subplots_adjust(top=0.95)
-```
 ![hex_green](https://user-images.githubusercontent.com/38530617/153745763-7d378c6e-efbd-4afa-a852-2fe983ffae76.png)
 ![hex_blue](https://user-images.githubusercontent.com/38530617/153745765-d36af02d-afc1-4226-8586-df5301d450eb.png)
 ![hex_red](https://user-images.githubusercontent.com/38530617/153745775-e0c6e828-d52b-4758-9406-ced67a9d36b6.png)
 ![hex_orange](https://user-images.githubusercontent.com/38530617/153745779-f30e6bfc-8a29-4989-822c-cb604bbd0e98.png)
-![hex_purple](https://user-images.githubusercontent.com/38530617/153745767-9e35d803-87a0-488b-b540-72beaeb09104.png)
 
 ```python
 from pandas import plotting
