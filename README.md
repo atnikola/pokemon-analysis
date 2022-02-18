@@ -338,8 +338,6 @@ Here we've created 50 bins so there will be 50 different clusters of pokemon. Th
 
 ![cluster4](https://user-images.githubusercontent.com/38530617/153747188-3ea042df-70b5-4972-bf44-4e3b9178be93.png)
 ![cluster5](https://user-images.githubusercontent.com/38530617/153747187-01251b73-257b-4fe6-a093-2c8423980726.png)
-![cluster6](https://user-images.githubusercontent.com/38530617/153747185-05c2cf18-828c-45d2-9236-a2dad7dbf9c3.png)
-![cluster8](https://user-images.githubusercontent.com/38530617/153747184-043fe9bf-bfa7-4b48-ab16-24668a4a3f99.png)
 ![cluster10](https://user-images.githubusercontent.com/38530617/153747182-e0dcd7e9-5bfc-4d70-8706-0e02c768f361.png)
 ![cluster50](https://user-images.githubusercontent.com/38530617/153747180-f55a5feb-fab9-4753-a102-433b3cc19411.png)
 
