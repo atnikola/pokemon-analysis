@@ -93,11 +93,6 @@ Those are definitely some fast pokemon!
 Let's now see if we can get any indication of whether a particular pokemon's type has an advantage over others in total stats.
 
 ```python
-types_color_dict = {
-    'grass':'#8ED752', 'fire':'#F95643', 'water':'#53AFFE', 'bug':"#C3D221", 'normal':"#BBBDAF", \
-    'poison': "#AD5CA2", 'electric':"#F8E64E", 'ground':"#F0CA42", 'fairy':"#F9AEFE", \
-    'fighting':"#A35449", 'psychic':"#FB61B4", 'rock':"#CDBD72", 'ghost':"#7673DA", \
-    'ice':"#66EBFF", 'dragon':"#8B76FF", 'dark':"#1A1A1A", 'steel':"#C3C1D7", 'flying':"#75A4F9" }
 
 plt.figure(figsize=(15,12), dpi=80)
 sns.violinplot(x='Primary', y='total', data=df, scale='width', inner='quartile', palette=types_color_dict)
@@ -111,13 +106,6 @@ The **dragon type** definitely has quite a high upper interquartile range compar
 
 Let's see what the most common type of pokemon is:
 ```python
-types_color_dict = {
-    'grass':'#8ED752', 'fire':'#F95643', 'water':'#53AFFE', 'bug':"#C3D221", 'normal':"#BBBDAF", \
-    'poison': "#AD5CA2", 'electric':"#F8E64E", 'ground':"#F0CA42", 'fairy':"#F9AEFE", \
-    'fighting':"#A35449", 'psychic':"#FB61B4", 'rock':"#CDBD72", 'ghost':"#7673DA", \
-    'ice':"#66EBFF", 'dragon':"#8B76FF", 'dark':"#1A1A1A", 'steel':"#C3C1D7", 'flying':"#75A4F9" }
-
-
 Type1 = pd.value_counts(df['Primary'])
 sns.set()
 dims = (11.7,8.27) #A4 dimensions
@@ -164,29 +152,6 @@ df.loc[df["is_sllm"]==True,"sllmid"] = 1
 # calculate proportion of SL, L, M #
 sllm_ratio = df.groupby("Gen").mean()["sllmid"]
 sllm_ratio.round(4)*100
-```
-
-```python
-sns.set_style('darkgrid')
-df_plot = pd.DataFrame(columns={"Gen","Rate","colors"})
-x = sllm_ratio.values
-df_plot["Gen"] = sllm_ratio.index
-df_plot['Rate'] = (x - x.mean())/x.std()
-df_plot['colors'] = ['red' if x < 0 else 'green' for x in df_plot['Rate']]
-df_plot.sort_values('Rate', inplace=True)
-df_plot.reset_index(inplace=True)
-
-plt.figure(figsize=(14, 10))
-plt.hlines(
-    y=df_plot.index, xmin=0, xmax=df_plot.Rate,
-    color=df_plot.colors,
-    alpha=.4,
-    linewidth=5)
-
-plt.gca().set(xlabel='Rate', ylabel='Gen')
-plt.yticks(df_plot.index, df_plot.Gen, fontsize=12)
-plt.title('Diverging Bars of SubL, Legendary & Mythical Rate', fontdict={'size':20})
-plt.show()
 ```
 
 ![sub, legend,myth](https://user-images.githubusercontent.com/38530617/153743612-15eb0d03-0606-4f18-9bcf-9215b963f79e.png)
