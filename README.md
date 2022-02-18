@@ -130,7 +130,7 @@ FigBar = BarT.get_figure()
 ```
 ![type_distribution](https://user-images.githubusercontent.com/38530617/153743003-888b9e1b-4353-4cb8-b07f-bfd93e513c29.png)
 
-We can see that the water and normal type pokemon are the most frequently appearing 'primary' types in the game.
+We can see that the water and normal type pokemon are the most frequently appearing 'primary' types in the game. Interesting to see Flying types as lowest however it makes sense when we only look at primary types as majority of pokemon that are dual types with Flying usually have flying as their 'secondary' type. Meaning, a Pokemon is usually never "Flying/Normal", it's always "Normal/Flying" for example. 
 
 Let's see how many pokemon are mono types vs dual-types so we can get a better sense of whether primary is sufficient.
 
@@ -509,7 +509,7 @@ Here we've created a histogram of clusters of pokemon that exhibit similar trait
 Some pokemon exhibit lots of traits similar to each other while others (like Regieleki) stand out.
     
 # [Cross Validation & Regression Analysis](#cv-ra)
-Since we saw earlier that Special Attack is a huge contributing factor to determining whether a pokemon is classified as 'legendary', let's use the rest of the stats to see if we can predict Special Attack!
+Since we saw earlier that Special Attack is a huge contributing factor to determining whether a pokemon is classified as 'legendary', let's use the rest of the stats to see if we can predict Special Attack.
     
 ```python
 X = df.iloc[:, 13:18]
@@ -579,14 +579,6 @@ print("Regression Coefficient= ", regr.coef_)
 print("Intercept= ", regr.intercept_)
 print("Coefficient of Determination= ", regr.score(Xs, ys))
 ```
-```
-Regression Coefficient=  [ 0.152545    0.11255532 -0.09718819  0.40725508  0.28208903]
-Intercept=  1.1730486200365748e-16
-Coefficient of Determination=  0.3958130072204933
-```
-```
-pd.DataFrame(regr.coef_, index=list(df.columns[[12, 13, 14, 16, 17]])).sort_values(0, ascending=False).style.bar(subset=[0])
-```
 <img width="224" alt="sp attack prediction" src="https://user-images.githubusercontent.com/38530617/153748185-68eac678-43dc-4636-98fd-ec6ed14bd448.png">
 
 It seems that Special Defense & Speed are very important in predicting "Special Attack"
@@ -596,4 +588,4 @@ Regression analysis, such as multiple regression analysis, uses numerical data a
     
 We saw that Special Attack is definitely a strong predictor for determining whether a pokemon is legendary or not - and we also saw that Special Defense & Speed are also important indicators of Special Attack Value.
 
-Overall this was a way of exploring different pokemon traits and taking into account multiple factors. There's plenty more we can look into such as 'strengths', 'weaknesses' etc.. I hope you all enjoyed this, and thanks for reading all the way through!
+Overall this was a way of exploring different pokemon traits and taking into account multiple factors. There's plenty more we can look into such as 'strengths', 'weaknesses' etc..which I may do at some point, but I hope you all enjoyed this, and thanks for reading all the way through!
