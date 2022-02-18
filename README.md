@@ -431,7 +431,7 @@ result1 = linkage(dfs,
                   method = 'average')
 plt.figure(figsize=(15, 150))
 dendrogram(result1, orientation='right', labels=list(df['Name']), color_threshold=2)
-plt.title("Dedrogram of Pokemon")
+plt.title("Dendrogram of Pokemon")
 plt.xlabel("Threshold")
 plt.grid()
 plt.show()
