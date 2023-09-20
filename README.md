@@ -14,7 +14,7 @@ _September 2023_
 In this project, I will aim to analyze the stats of all Pokemon in Generations 1 - 9, and calculate some statistics based on a number of factors.
 In the following sections, I will walk through my process of extracting and analyzing the information using ```pandas```, creating some visualizations and modeling using ```scikit-learn```.
 
-## [Exploratory Analysis](#exploratory)
+## [Exploratory Analysis] (#exploratory)
 Start by importing all the necessary packages into Python:
 ```python
 import numpy as np
