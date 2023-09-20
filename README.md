@@ -404,38 +404,11 @@ plt.show()
 
 Interestingly, it seems that BOTH factor 1 & 2 allude to DEFENSE
 
-Let's create some charts!
-I wanted to see which pokemon exhibit similar characteristics to each other so I created a cluster of IDs to group together pokemon with similar attributes and distribution of stats:
-
 ```python
-clusterIDs = get_cluster_by_number(result1, 50)
-print(clusterIDs)
+X = df.iloc[:, 7:13]
+y = df['Total']
 ```
-<img width="1364" alt="cluster_ids" src="https://user-images.githubusercontent.com/38530617/153746879-35524b22-aa1a-46a0-b807-9712d474bda0.png">
 
-```python
-plt.hist(clusterIDs, bins=50)
-plt.show()
-```
-![histo](https://user-images.githubusercontent.com/38530617/153746942-f5986c3e-0267-413d-80bc-b744e84b46cd.png)
-
-Here we've created 50 bins so there will be 50 different clusters of pokemon. That's quite a large number of charts to display so I'll just display several so you get the idea.
-
-![cluster4](https://user-images.githubusercontent.com/38530617/153747188-3ea042df-70b5-4972-bf44-4e3b9178be93.png)
-![cluster5](https://user-images.githubusercontent.com/38530617/153747187-01251b73-257b-4fe6-a093-2c8423980726.png)
-![cluster10](https://user-images.githubusercontent.com/38530617/153747182-e0dcd7e9-5bfc-4d70-8706-0e02c768f361.png)
-![cluster50](https://user-images.githubusercontent.com/38530617/153747180-f55a5feb-fab9-4753-a102-433b3cc19411.png)
-
-Some pokemon exhibit lots of traits similar to each other while others (like Regieleki) stand out due to their incredible speed as we saw earlier in the highest speed stat in **Gen VIII**.
-    
-# [Cross Validation & Regression Analysis](#cv-ra)
-Since we saw earlier that Special Attack is a huge contributing factor to determining whether a pokemon is classified as 'legendary', let's use the rest of the stats to see if we can predict Special Attack and which stats are best contributors for determining this stat.
-    
-```python
-X = df.iloc[:, 13:18]
-y = df['total']
-```
-    
 ```python
 from sklearn import linear_model
 regr = linear_model.LinearRegression()
@@ -445,40 +418,55 @@ print("Regression Coefficient= ", regr.coef_)
 print("Intercept= ", regr.intercept_)
 print("Coefficient of Determination= ", regr.score(X, y))
 ```
+<img width="359" alt="Screenshot 2023-09-21 at 0 01 36" src="https://github.com/atnikola/pokemon-analysis/assets/38530617/3b7294ef-b659-4799-8907-17feef51b3b4">
 
+Let's see if we can predict the "Defense" stat with these 4 variables
 ```python
-df.columns[[12, 13, 14, 16, 17]]
-X = df.iloc[:, [12, 13, 14, 16, 17]]
-y = df['SP_Attack']
+X = df.iloc[:, [7, 10, 11, 12]]
+y = df['Defense']
 ```
-### Cross Validation
-In machine learning, in order to evaluate performance, known data is divided into ```training``` and ```test``` data. Training (learning) is performed using training data to build a prediction model, and performance evaluation is based on how accurately the test data that was not used to build the prediction model can be predicted.
+```python
+from sklearn import linear_model
+regr = linear_model.LinearRegression()
+regr.fit(X, y)
 
-Training data (60% of all data)
-X_train: Explanatory variables for training data
-y_train: Objective variable for training data
-Test data (40% of all data)
-X_test: Explanatory variable for test data
-y_test: Objective variable for test data
-We aim to learn the relationship between X_train and y_train and predict y_test from X_test. If the training data seems to show good performance, but the test data not used for training has poor performance, the model is said to be "overfitted".
+print("Regression Coefficient= ", regr.coef_)
+print("Intercept= ", regr.intercept_)
+print("Coefficient of Determination= ", regr.score(X, y))
+```
+<img width="579" alt="Screenshot 2023-09-21 at 0 02 42" src="https://github.com/atnikola/pokemon-analysis/assets/38530617/4ba91acb-c78e-451a-8713-27cc7b10bef3">
+
+'Defense' = (0.16 * HP + -0.04 * Sp.Attack + 0.54 * Special Defense + -0.11 * Speed) + 33.4(intercept)
+
+That's the relationship to predict Defense. Which makes sense for the most part as typically Special Defense correlates to Defense in games. HP being low/neutral is a bit surprising.
+However, the coefficient of determination is so small that this may not be a reliable model..
+    
+# [Cross Validation & Regression Analysis](#cv-ra)
+Since we saw earlier that Defense is a huge contributing factor to determining whether a pokemon is classified as 'legendary', let's use the rest of the stats to see if we can predict Defense and which stats are best contributors for determining this stat.
     
 ```python
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.4)
 ```
+    
+```python
+from sklearn import linear_model
+regr = linear_model.LinearRegression()
+regr.fit(X_train, y_train)
+print("Regression Coefficient= ", regr.coef_)
+print("Intercept= ", regr.intercept_)
+print("Coefficient of Determination(train)= ", regr.score(X_train, y_train))
+print("Coefficient of Determination(test)= ", regr.score(X_test, y_test))
 ```
-Regression Coefficient=  [ 0.15598049  0.09796333 -0.11115187  0.47986509  0.32513351]
-Intercept=  5.4684249031776915
-Coefficient of Determination(train)=  0.39594357153305826
-Coefficient of Determination(test)=  0.38127048972638855
-```
-These values change with each calculation because the division into training data and test data is based on random pulls.
-If you want to calculate a regression equation, you can standardize the explanatory variables and objective variables and then regressing, then find the "standard regression coefficient", which is an index determining the value. 
+<img width="567" alt="Screenshot 2023-09-21 at 0 05 31" src="https://github.com/atnikola/pokemon-analysis/assets/38530617/444b7c9a-2ad0-491a-8b6a-a9618b855415">
+The above values change with each calculation because the division into training data and test data is random.
+If you want to find a regression equation, you can do as above, but by standardizing the explanatory variables and objective variables and then regressing, you can find the "standard regression coefficient", which is an index of "importance of variables".
 
 ```python
 Xs = X.apply(lambda x: (x-x.mean())/x.std(), axis=0)
 ys = list(pd.DataFrame(y).apply(lambda x: (x-x.mean())/x.std()).values.reshape(len(y),))
 ```
+
 ```python
 from sklearn import linear_model
 regr = linear_model.LinearRegression()
@@ -489,9 +477,16 @@ print("Regression Coefficient= ", regr.coef_)
 print("Intercept= ", regr.intercept_)
 print("Coefficient of Determination= ", regr.score(Xs, ys))
 ```
-<img width="224" alt="sp attack prediction" src="https://user-images.githubusercontent.com/38530617/153748185-68eac678-43dc-4636-98fd-ec6ed14bd448.png">
+<img width="574" alt="Screenshot 2023-09-21 at 0 06 50" src="https://github.com/atnikola/pokemon-analysis/assets/38530617/d3da5b14-d23c-4fad-8bff-47328da9a771">
+
+```python
+pd.DataFrame(regr.coef_, index=list(df.columns[[7, 10, 11, 12]])).sort_values(0, ascending=False).style.bar(subset=[0])
+```
+<img width="220" alt="Screenshot 2023-09-21 at 0 07 11" src="https://github.com/atnikola/pokemon-analysis/assets/38530617/f0075a00-20cc-4aa7-8d8e-c2b7cbae44c6">
+
+It seems that Special Defense is very important in predicting "Defense!!"
 
 # [Conclusion](#conclusion)
-It seems that Special Defense & Speed are the best determinators in predicting "Special Attack". This makes perfect sense as usually a High Special Attacking pokemon is more 'special' focused and typically has less physical bulk. Additionally because of this, if these pokemon get hit by a physical move that's strong enough they could 1HKO them which is why Speed also plays a huge roll. The faster you are the higher the chance that you will attack first and survive. (Pretty basic for most Pokemon players >.>) 
+It seems that Special Defense is the best determinator in predicting "Defense". This makes perfect sense as usually a High Defensive pokemon is usually also highly special defensive focused. Additionally, these pokemon are typically much slower which makes sense that 'Speed' would be negative. Additionally most 'non-defensive' pokemon could get 1HKO'ed by a strong move which is why Speed also plays a huge roll for those pokemon. The faster you are the higher the chance that you will attack first and survive. (Pretty basic for most Pokemon players >.>) 
 
-Overall this was a way of exploring different pokemon traits and taking into account multiple factors. There's plenty more we can look into such as 'strengths', 'weaknesses' etc..which I may do at some point, but I hope you all enjoyed this, and thanks for reading all the way through!
+Overall this was a way of exploring different pokemon traits and taking into account multiple factors. There's PLENTY more we can look into such as 'strengths', 'weaknesses' etc..which I may do at some point, but I hope you all enjoyed this, and thanks for reading all the way through! If you spot any errors or have any suggestions for visuals or further analysis, please feel free to drop a message!
