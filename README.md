@@ -251,25 +251,43 @@ Some other charts showing stat correlations:
 ![863627ea-37f4-490c-8e9b-f1f60dbcbcfe](https://github.com/atnikola/pokemon-analysis/assets/38530617/95d682bd-acc1-4bbe-9d87-bf2bab006951)
 ![40db912c-61c7-4d9b-9584-27c845e59fef](https://github.com/atnikola/pokemon-analysis/assets/38530617/222a7ce5-dd0e-4268-9b33-d4666d0881ae)
 
-
-
-extra:
+Let's take a look at diverging bars based on Attack to see what pokemon type stands out in that specific stat:
 
 ```python
-from pandas import plotting
-type1 = list(set(list(df['Primary'])))
-cmap = plt.get_cmap('viridis')
-colors = [cmap((type1.index(c) + 1) / (len(type1) + 2)) for c in df['Primary'].tolist()]
-plotting.scatter_matrix(df.iloc[:, 13:18], figsize=(15, 15), color=colors, alpha=0.7) 
+attack_byType = df.groupby("Primary").mean()["Attack"]
+
+df_plot2 = pd.DataFrame(columns=["Type","Attack","colors"]) #square brackets
+x = attack_byType.values
+df_plot2["Type"] = attack_byType.index
+df_plot2['Attack'] = (x - x.mean())/x.std()
+df_plot2['colors'] = ['red' if x < 0 else 'green' for x in df_plot2['Attack']]
+df_plot2.sort_values('Attack', inplace=True)
+
+plt.figure(figsize=(14,14), dpi=80)
+plt.hlines(y=df_plot2.Type, xmin=0, xmax=df_plot2.Attack)
+for x, y, tex in zip(df_plot2.Attack, df_plot2.Type, df_plot2.Attack):
+    t = plt.text(
+        x, y, round(tex, 2),
+        horizontalalignment='right' if x < 0 else 'left',
+        verticalalignment='center',
+        fontdict={'color':'red' if x < 0 else 'green', 'size':15})
+
+plt.yticks(df_plot2.Type, df_plot2.Type, fontsize=12)
+plt.title('Diverging Text Bars of Attack by Type', fontdict={'size':20})
+plt.xlim(-3, 3)
 plt.show()
 ```
-![corrplot](https://user-images.githubusercontent.com/38530617/153744465-059f49d5-697e-43b4-b25d-b1ebdb409eba.png)
+![accd1eab-c264-427d-b171-e4d9a9a13fc1](https://github.com/atnikola/pokemon-analysis/assets/38530617/22285150-b394-4d0e-8532-86c0f81a8cf6)
 
+**Seems like FIGHTING type is the most common**
+
+Let's take a look at distribution of stats:
 ```python
-pd.DataFrame(np.corrcoef(df.iloc[:, 13:18].T.values.tolist()), 
-             columns=df.iloc[:, 13:18].columns, index=df.iloc[:, 13:18].columns)
+df.describe()
 ```
-<img width="477" alt="corrplot values" src="https://user-images.githubusercontent.com/38530617/153744483-6d01ea6a-b457-4ccc-94d0-4fc2f00118cb.png">
+<img width="1135" alt="Screenshot 2023-09-20 at 23 49 46" src="https://github.com/atnikola/pokemon-analysis/assets/38530617/423caa07-d0ec-445c-8fe0-90c189679924">
+
+![81c966c7-e2c7-4e8e-b355-4bc196d4dfa1](https://github.com/atnikola/pokemon-analysis/assets/38530617/fbed4f8f-e6e9-418d-b5c3-d14a40f5b5e1)
 
 ```python
 labels = ["Defense", "Attack"]
@@ -281,37 +299,12 @@ Atthist.set(title='Distribution of Defense & Attack')
 plt.legend(labels, loc="best")
 FigHist = Atthist.get_figure()
 ```
-![attack_defense](https://user-images.githubusercontent.com/38530617/153744067-1e1730c9-c360-483d-9159-45d9b53f452b.png)
+![cb95c0fc-7cf7-4506-87fb-e6d10a641335](https://github.com/atnikola/pokemon-analysis/assets/38530617/addb9392-d30b-43e1-bb4b-f2a2df7e2a61)
 
-```python
-fig, ax = plt.subplots(2, 3, figsize=(14, 8), sharey=True)
-
-spines = ["top","right","left"]
-for i, col in enumerate(["HP", "Attack", "Defense", "SP_Attack", "SP_Defense", "Speed"]):
-    sns.kdeplot(x=col, data=df, label=col, ax=ax[i//3][i%3],
-                fill=True, color='lightblue', linewidth=2
-               )
-    
-    ax[i//3][i%3].set_xlim(-5, 250)
-    
-    for s in spines:
-        ax[i//3][i%3].spines[s].set_visible(False)
-        
-
-plt.tight_layout()
-plt.show()
-```
-![density_plots](https://user-images.githubusercontent.com/38530617/153744330-f743c4ac-a7c6-4384-a190-b83eb69c19a2.png)
-
-```python
-df.describe()
-```
-<img width="973" alt="std_dev_att_def" src="https://user-images.githubusercontent.com/38530617/153744167-f8896e9f-2a77-486b-a409-36f9bcc85d55.png">
-
-Looking at the summary statistics, we can see that the assumption about the variance and skewness of both plots was correct. The ‘std’ metric of the Attack is less than Defense, meaning that Defense statistics are more spread. Similarly, the Sp.Atk ‘std’ is larger than that of the Sp.Def. Skewness is determined by the positions of the median (50%) and the mean. Since in all instances (Attack, Defense, Sp.Attack and Sp.Defense) the mean is greater than the median, it is emphasised that the distribution is right-skewed (positively skewed).
+By calling on the summary statistics, we can see that the assumption about the variance and skewness of both plots was correct. The ‘std’ metric (standard deviation) of 'Sp.Atk is larger than that of the Sp.Def. Skewness is determined by the positions of the median (50%) and the mean. Since in all instances (Attack, Defense, Sp.Attack and Sp.Defense) the mean is greater than the median, it is emphasised that the distribution is right-skewed (positively skewed).
 
 # [Principal Component Analysis (PCA)](#pca)
-Let's take a look at PCA analysis and plot Pokemon in a two-dimensional plane using the first and second principal components.
+Let's take a look at PCA and plot Pokemon in a two-dimensional plane using the first and second principal components.
 PCA is a type of multivariate analysis method that is often used as a dimensionality reduction method and sometimes regarded as a type of **unsupervised ML**, revealing the structure of the data itself. 
 
 In this data, the characteristics of all Pokemon total stats are represented by **6 types** of **"observed variables"** (x1, x2, x3, x4, x5, x6). 
@@ -325,34 +318,38 @@ In principal component analysis, the larger the ```eigenvalue``` (= variance of 
 ```python
 from sklearn.decomposition import PCA
 pca = PCA()
-pca.fit(df.iloc[:, 13:18])
-feature = pca.transform(df.iloc[:, 13:18])
-plt.figure(figsize=(15, 15))
+pca.fit(df.iloc[:, 7:13])
+feature = pca.transform(df.iloc[:, 7:13])
+plt.figure(figsize=(8,8))
 plt.scatter(feature[:, 0], feature[:, 1], alpha=0.8)
 plt.xlabel('PC1')
 plt.ylabel('PC2')
 plt.grid()
-plt.show()
+#plt.show()
 ```
-![PCA](https://user-images.githubusercontent.com/38530617/153744763-f3c32c09-0534-4c58-809f-e0212e10ca05.png)
+![1bec3a8d-e2e0-43e6-aa27-a26a6633d26b](https://github.com/atnikola/pokemon-analysis/assets/38530617/b8f3d97b-eaed-43e9-9fc3-77e85f69c68f)
+
 
 ```python
+import matplotlib.ticker as ticker
+
 plt.gca().get_xaxis().set_major_locator(ticker.MaxNLocator(integer=True))
 plt.plot([0] + list( np.cumsum(pca.explained_variance_ratio_)), "-o")
-plt.xlabel("Number of Components")
-plt.ylabel("CCR")
+plt.xlabel("# PC")
+plt.ylabel("Cumulative contribution ratio")
 plt.grid()
-plt.show()
+#plt.show()
 ```
-![components](https://user-images.githubusercontent.com/38530617/153744830-3f86c909-c3de-4ff1-bbae-c0c32cd90f53.png)
+![21a2ac5a-825c-4a24-ad2e-314905c00dcf](https://github.com/atnikola/pokemon-analysis/assets/38530617/89470f4d-9f07-4b80-834c-b58926b7d225)
+
     
 Let's see if we can determine what makes a pokemon **'LEGENDARY'**
 
 ```python
 pca = PCA()
-pca.fit(df.iloc[:, 13:18])
-feature = pca.transform(df.iloc[:, 13:18])
-plt.figure(figsize=(15, 15))
+pca.fit(df.iloc[:, 7:13])
+feature = pca.transform(df.iloc[:, 7:13])
+plt.figure(figsize=(8,8))
 for binary in [True, False]:
     plt.scatter(feature[df['is_sllm'] == binary, 0], feature[df['is_sllm'] == binary, 1], alpha=0.8, label=binary)
 plt.xlabel('PC1')
@@ -361,20 +358,22 @@ plt.legend(loc = 'best')
 plt.grid()
 plt.show()
 ```
-![pca_color](https://user-images.githubusercontent.com/38530617/153744885-42ed952b-05de-4f8a-a658-b6b64ba1d29d.png)
+![4b3563ff-d1db-470a-a000-a2d54d932509](https://github.com/atnikola/pokemon-analysis/assets/38530617/462add39-5b33-4c06-97d6-52ccd66b6996)
+
 
 Although it's not 'perfect' we can clearly see that when the first principal component (PC1) reaches 50, we start to see a significantly higher concentration of legendary pokemon. Now, let's illustrate how much PC1 actually contributes to the explanatory variable (parameter) with a loading plot.
 
-![components_stats](https://user-images.githubusercontent.com/38530617/153745198-40a1fa84-cb1a-4118-a0d1-68ed7a50bb84.png)
+![6c28d244-5778-44f6-9485-84e38158cec2](https://github.com/atnikola/pokemon-analysis/assets/38530617/e4dd48ac-dd48-4c8a-928b-9c2d5f4af34d)
 
-Assuming that PC1 is actually a strong indicator of whether or not a pokemon is classified as legendary, sub-legendary or mythical, it seems like Special Attack is of of the strongest indicators out of all stats (followed by Physical Attack)
+
+Assuming that PC1 is actually a strong indicator of whether or not a pokemon is classified as legendary, sub-legendary or mythical, it seems like Attack is one of the strongest indicators out of all stats (followed by Special Attack)
 
 In PCA, we synthesized the "principal component" yPC1 which is a linear combination of the weight matrix (eigenvector) a for the explanatory variables. Here, define as many principal components as there are explanatory variables.
     
 ```python
 from sklearn.decomposition import FactorAnalysis
 fa = FactorAnalysis(n_components=2, max_iter=500)
-factors = fa.fit_transform(df.iloc[:, 13:18])
+factors = fa.fit_transform(df.iloc[:, 7:13])
 ```
 
 ```python
@@ -387,13 +386,13 @@ plt.legend(loc = 'best')
 plt.grid()
 plt.show()
 ```
-![pca_color2](https://user-images.githubusercontent.com/38530617/153745352-7366b274-3ff8-4bbc-bd4d-327bec30f3eb.png)
+![87c2ebdc-0485-4696-add1-c58cfccaa03f](https://github.com/atnikola/pokemon-analysis/assets/38530617/94065410-00c5-42bf-bc8f-f4e75cd090f6)
 
 In this instance, the determining factor of a 'legendary' is whether or not the sum of factor 1 and factor 2 exceeds a certain level, but it seems that it is slightly biased toward the larger factor 2. So which parameters do factor 2 and factor 1 allude to?
 
 ```python
-plt.figure(figsize=(8, 8))
-for x, y, name in zip(fa.components_[0], fa.components_[1], df.columns[13:18]):
+plt.figure(figsize=(12, 12))
+for x, y, name in zip(fa.components_[0], fa.components_[1], df.columns[7:13]):
     plt.text(x, y, name)
 plt.scatter(fa.components_[0], fa.components_[1])
 plt.grid()
@@ -401,10 +400,9 @@ plt.xlabel("Factor 1")
 plt.ylabel("Factor 2")
 plt.show()
 ```
-![component_stats(factor2)](https://user-images.githubusercontent.com/38530617/153745455-4f348603-8330-4d05-a467-261ebc35c02c.png)
+![9c22963c-da88-4a30-848e-5e90b10acc24](https://github.com/atnikola/pokemon-analysis/assets/38530617/a59e7c6d-f0ef-45f8-a78e-f617e4b61fb6)
 
-Factor 1 highest value = "Defense"
-Factor 2 highest value = "Special Attack" 
+Interestingly, it seems that BOTH factor 1 & 2 allude to DEFENSE
 
 Let's create some charts!
 I wanted to see which pokemon exhibit similar characteristics to each other so I created a cluster of IDs to group together pokemon with similar attributes and distribution of stats:
