@@ -1,7 +1,7 @@
 # Pokémon Analysis
 **Andreas Nikolaidis** 
 
-_February 2022_
+_September 2023_
 
 - [Introduction](#introduction)
 - [Exploratory Analysis](#exploratory)
@@ -11,13 +11,7 @@ _February 2022_
 - [Conclusion](#conclusion)
 
 ## [Introduction](#introduction)
-In this project, I utilize Python to analayze the stats of all Pokemon in Generations 1 - 8, and calculate some interesting statistics based on a number of relevant factors that contribute to 'stength' in game. 
-
-With these stats we can use the data to answer questions such as:
-- **Does a Pokemon's Type determine it's stats?: HP, Attack, Defense, etc.?**
-- **What is the most important stat for predicting other stats? i.e. which stats have a high correlation?**
-- **What attributes classify a Pokemon as 'Legendary'?**
-
+In this project, I will aim to analyze the stats of all Pokemon in Generations 1 - 9, and calculate some statistics based on a number of factors.
 In the following sections, I will walk through my process of extracting and analyzing the information using ```pandas```, creating some visualizations and modeling using ```scikit-learn```.
 
 ## [Exploratory Analysis](#exploratory)
@@ -43,6 +37,7 @@ from sklearn.cluster import KMeans
 Read Data File:
 ```python
 df = pd.read_excel("pokemon.xlsx")
+df.head()
 ```
 Create a separate dataframe including just the necessary stats:
 ```python
@@ -52,16 +47,27 @@ Although each stat is important in it's own right, the total value of all stats 
 ```python
 df['total'] = df.HP + df.Attack + df.Defense + df.SP_Attack + df.SP_Defense + df.Speed
 ```
+```
+df.head(3).style.bar(subset=['Total', 'HP', 'Attack', 'Defense', 'SP_Attack', 'SP_Defense', 'Speed'])
+```
+```
+#Create a dataframe of just the main stats excluding other 'non important' variables
+df_stats = df[["Name","HP","Attack","Defense","SP_Attack","SP_Defense","Speed"]]
+```
+
+**Visuals**
 
 Now let's view the range of total stats by each generation:
 ```python
-#palette: https://seaborn.pydata.org/tutorial/color_palettes.html?highlight=color
 plt.figure(figsize=(13,10), dpi=80)
-sns.violinplot(x='Gen', y='total', data=df, scale='width', inner='quartile', palette='Set2') 
+sns.violinplot(df, x='Gen', y='Total', scale='width', inner='quartile', palette='pastel') 
+#palette: https://seaborn.pydata.org/tutorial/color_palettes.html?highlight=color
+
 plt.title('Violin Plot of Total Stats by Generation', fontsize=22)
 plt.show()
 ```
 ![2df65225-732a-4581-af16-46cbaf14b931](https://user-images.githubusercontent.com/38530617/153741822-44e70858-0ce7-436c-b649-5c172f4ce08f.png)
+
 
 In the above violinplot we can see that each generation has quite a different range of total stats with Gens IV, VII, & VIII having the longest range, while Gen V had a relatively tight range of stats. All Generations from IV onwards had higher medians than the first 3 generations. 
 
