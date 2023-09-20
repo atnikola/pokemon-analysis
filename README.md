@@ -66,21 +66,20 @@ sns.violinplot(df, x='Gen', y='Total', scale='width', inner='quartile', palette=
 plt.title('Violin Plot of Total Stats by Generation', fontsize=22)
 plt.show()
 ```
-![2df65225-732a-4581-af16-46cbaf14b931](https://user-images.githubusercontent.com/38530617/153741822-44e70858-0ce7-436c-b649-5c172f4ce08f.png)
+![3449927f-f35f-4049-9687-e79ec7ec7733](https://github.com/atnikola/pokemon-analysis/assets/38530617/d54ed598-9c52-4f91-8c48-a446ee757078)
 
+In the above violinplot we can see that each generation has quite a different range of total stats with Gens IV, VII, & VIII having the longest range, while Gen V had a relatively tight range of stats. All Generations from IV onwards had higher medians than the first 3 generations.
 
-In the above violinplot we can see that each generation has quite a different range of total stats with Gens IV, VII, & VIII having the longest range, while Gen V had a relatively tight range of stats. All Generations from IV onwards had higher medians than the first 3 generations. 
-
-Looking at individual stats, **Speed** is one of (if not THE) most important stat in competitive play, so let's examine which generations had the best overall speed stats.
+Looking at individual stats, Speed is one of (if not THE) most important stat in competitive play, so let's examine which generations had the best overall speed stats.
 
 ```python
 plt.figure(figsize=(13,10), dpi=80)
-sns.violinplot(x='Gen', y='Speed', data=df, scale='width', inner='quartile', palette='Set2')
+sns.violinplot(df, x='Gen', y='Speed', scale='width', inner='quartile', palette='pastel')
 
-plt.title('Violin Plot of Total Stats by Generation', fontsize=22)
+plt.title('Violin Plot of Speed Stats by Generation', fontsize=22)
 plt.show()
 ```
-![speed](https://user-images.githubusercontent.com/38530617/153742342-dfcc2c47-541f-44f2-8998-a04a83ebe10d.png)
+![c9a2dfd0-832a-4f7e-bde1-9e62783d8073](https://github.com/atnikola/pokemon-analysis/assets/38530617/99858c36-8213-469f-8132-083ef9124c64)
 
 Here we can clearly see Generation VIII has some of the fastest pokemon ever seen in games. Let's create a function to return the top 10 fastest pokemon in Gen VIII and their respective speed stat values:
 
