@@ -47,10 +47,10 @@ Although each stat is important in it's own right, the total value of all stats 
 ```python
 df['total'] = df.HP + df.Attack + df.Defense + df.SP_Attack + df.SP_Defense + df.Speed
 ```
-```
+```python
 df.head(3).style.bar(subset=['Total', 'HP', 'Attack', 'Defense', 'SP_Attack', 'SP_Defense', 'Speed'])
 ```
-```
+```python
 #Create a dataframe of just the main stats excluding other 'non important' variables
 df_stats = df[["Name","HP","Attack","Defense","SP_Attack","SP_Defense","Speed"]]
 ```
@@ -91,31 +91,60 @@ def top_n(df, category, n):
 print('Top 10 Pokemon Speed')
 top_n(df, 'Speed', 10)
 ```
-<img width="238" alt="speed_gen8" src="https://user-images.githubusercontent.com/38530617/153742615-a6d3e5a6-12d6-45de-bef5-4377deef61e7.png">
+<img width="240" alt="Screenshot 2023-09-20 at 23 23 24" src="https://github.com/atnikola/pokemon-analysis/assets/38530617/d24e9674-2156-4501-afb7-7374cfb5666b">
 
 Those are definitely some fast pokemon!
 
 Let's now see if we can get any indication of whether a particular pokemon's type has an advantage over others in total stats.
 
 ```python
+#custom colors based on color of types from games
+types_color_dict = {
+    'grass':'#8ED752', 'fire':'#F95643', 'water':'#53AFFE', 'bug':"#C3D221", 'normal':"#BBBDAF", \
+    'poison': "#AD5CA2", 'electric':"#F8E64E", 'ground':"#F0CA42", 'fairy':"#F9AEFE", \
+    'fighting':"#A35449", 'psychic':"#FB61B4", 'rock':"#CDBD72", 'ghost':"#7673DA", \
+    'ice':"#66EBFF", 'dragon':"#8B76FF", 'dark':"#1A1A1A", 'steel':"#C3C1D7", 'flying':"#75A4F9" }
 
-plt.figure(figsize=(15,12), dpi=80)
-sns.violinplot(x='Primary', y='total', data=df, scale='width', inner='quartile', palette=types_color_dict)
 
-plt.title('Violin Plot of Total Stats by Type', fontsize=20)
+plt.figure(figsize=(30,12), dpi=80)
+sns.violinplot(df, x='Primary', y='Total', scale='width', inner='quartile', palette=types_color_dict)
+
+plt.title('Violin Plot of Total Stats by Type', fontsize=15)
 plt.show()
 ```
-![total_type_stats](https://user-images.githubusercontent.com/38530617/153742776-8ff03580-972e-4b37-a9cb-daed42e09163.png)
+![e03d6822-c752-41bc-9177-1b1227d64807](https://github.com/atnikola/pokemon-analysis/assets/38530617/de20b320-b81d-484d-8dc6-5d1d0a1e44f3)
 
-The **dragon type** definitely has quite a high upper interquartile range compared to other types. Meanwhile water & fairy types seem to have quite a large variance in total stats. 
+The **dragon type** definitely has quite a high upper interquartile range compared to other types, which makes sense as many legendary are dragon type. Meanwhile water & fairy types seem to have quite a large variance in total stats. 
 
 Let's see what the most common type of pokemon is:
+```python
+Type1 = pd.value_counts(df['Primary'])
+sns.set()
+dims = (25,8)
+fig, ax=plt.subplots(figsize=dims)
+BarT = sns.barplot(df, x=Type1.index, y=Type1, palette=types_color_dict, ax=ax)
+BarT.set_xticklabels(BarT.get_xticklabels(), rotation= 90, fontsize=12)
+BarT.set(ylabel = 'Frequency')
+BarT.set_title('Distribution of Primary Pokemon Types')
 
-![type_distribution](https://user-images.githubusercontent.com/38530617/153743003-888b9e1b-4353-4cb8-b07f-bfd93e513c29.png)
+##Annotate values
+for bar in BarT.patches:
+    BarT.annotate(format(bar.get_height(), '.0f'),
+                   (bar.get_x() + bar.get_width() / 2,
+                    bar.get_height()), ha='center', va='center',
+                   size=10, xytext=(0, 8),
+                   textcoords='offset points')
 
-We can see that the water and normal type pokemon are the most frequently appearing 'primary' types in the game. Interesting to see Flying types as lowest however it makes sense when we only look at primary types as majority of pokemon that are dual types with Flying usually have flying as their 'secondary' type. Meaning, a Pokemon is usually never "Flying/Normal", it's always "Normal/Flying" for example. 
+FigBar = BarT.get_figure()
+```
+
+![9d8c1816-81cf-4677-9e23-fedb6cc29256](https://github.com/atnikola/pokemon-analysis/assets/38530617/6aadfa44-f230-4fd7-9614-c7f4d4199e6f)
+
+We can see that the water and normal type pokemon are the most frequently appearing 'primary' types in the game. Interesting to see Flying types as lowest however it makes sense when we only look at primary types as majority of pokemon that are dual types with Flying usually have flying as their 'secondary' type. Meaning, a Pokemon is normally not "Flying/Normal", it's most commonly: "Normal/Flying" for example. 
 
 Let's see how many pokemon are mono types vs dual-types so we can get a better sense of whether primary is sufficient.
+
+A simple method would be to do a count over but lets create a chart:
 
 ```python
 labels = ['Mono type pokemon', 'Dual type pokemon']
@@ -123,15 +152,15 @@ sizes = [monotype, dualtype]
 colors = ['lightskyblue', 'lightcoral']
 
 patches, texts, _ = plt.pie(sizes, colors=colors, autopct='%1.1f%%', startangle=90, explode=(0,0.1))
-plt.legend(patches, labels, loc="best")
+plt.legend(patches, labels, loc='center left', bbox_to_anchor=(1.0, 0.5))
 plt.axis('equal')
 plt.title('Dual-Type Ratio', fontsize=12)
 plt.tight_layout()
 plt.show()
 ```
-![mono_dual](https://user-images.githubusercontent.com/38530617/153743106-853f1990-c3d3-4cfb-8db7-dd119929d39c.png)
+![0a54a33b-da39-47ef-8344-f6dca35cf9de](https://github.com/atnikola/pokemon-analysis/assets/38530617/8a24c134-3e20-473c-90f5-486c64ef75de)
 
-**Looks like there's actually more dual types than mono-types!**
+**Looks like there's actually more dual types than mono-types**
 
 Aside from types, there are also 5 categories of pokemon: Regular, Pseudo-Legendary, Sub-Legendary, Legendary and Mythical. (There are of course also pre-evolutions, final evolutions, mega-evolutions etc.. but for the purposes of this analysis we will just bundle those together under 'regular' along with Pseudo-Legendary which are regular pokemon that have generally higher stats of 600 total. 
 As for Sub Legendaries, Legendaries and Mythical - these pokemon typically exhibit **2 types of traits**: 
@@ -148,30 +177,83 @@ df.loc[df["is_sllm"]==True,"sllmid"] = 1
 sllm_ratio = df.groupby("Gen").mean()["sllmid"]
 sllm_ratio.round(4)*100
 ```
+<img width="107" alt="Screenshot 2023-09-20 at 23 36 03" src="https://github.com/atnikola/pokemon-analysis/assets/38530617/fb6bf1e4-abd1-4417-a788-04284f98505a">
 
-![sub, legend,myth](https://user-images.githubusercontent.com/38530617/153743612-15eb0d03-0606-4f18-9bcf-9215b963f79e.png)
+```python
+sns.set_style('darkgrid')
+df_plot = pd.DataFrame(columns=["Gen", "Rate", "colors"])  # Use square brackets [] here
+x = sllm_ratio.values
+df_plot["Gen"] = sllm_ratio.index
+df_plot['Rate'] = (x - x.mean()) / x.std()
+df_plot['colors'] = ['red' if x < 0 else 'green' for x in df_plot['Rate']]
+df_plot.sort_values('Rate', inplace=True)
+df_plot.reset_index(inplace=True)
 
-Seems like Gen 7's **Alola** region has a huge volume of these 'legendaries & mythical' pokemon, which after digging further into it makes perfect sense given the introduction of a plethora of legendaries called **'ultra beasts'** which were only ever introduced in that generation.
+plt.figure(figsize=(10, 10))
+plt.hlines(
+    y=df_plot.index, xmin=0, xmax=df_plot.Rate,
+    color=df_plot.colors,
+    alpha=.4,
+    linewidth=5)
+
+plt.gca().set(xlabel='Rate', ylabel='Gen')
+plt.yticks(df_plot.index, df_plot.Gen, fontsize=12)
+plt.title('Diverging Bars Rate', fontdict={'size': 20})
+plt.show()
+```
+![4292a7a5-2046-49f4-a8c0-336bd274f3ca](https://github.com/atnikola/pokemon-analysis/assets/38530617/26a83d37-6d44-4215-a8aa-bbab928bf97b)
+
+Seems like Gen 7's **Alola** region has a huge volume of these 'legendaries & mythical' pokemon, which after digging further into it makes perfect sense given the introduction of a plethora of legendaries called **ultra beasts** which were only ever introduced in that generation.
 
 ## [Correlations & Descriptive Statistics](#descriptive)
 Let's move to explore some correlations between stats.
 
 ```python
-#Correlation
-Base_stats = ['Primary','Secondary','Classification','%Male','%Female',
-              'Height','Weight','Capture_Rate','Base_Steps','HP','Attack','Defense',
+from pandas import plotting
+plotting.scatter_matrix(df_stats, figsize=(10, 10)) 
+plt.show()
+```
+![1cbcd222-5f80-4669-9e57-73ced0d6c60c](https://github.com/atnikola/pokemon-analysis/assets/38530617/2338fb4e-4a9a-4b15-a90a-f9e09547c83c)
+
+```python
+corrcoef = np.corrcoef(df_stats.iloc[:, 1:7].T.values.tolist())
+plt.imshow(corrcoef, interpolation='nearest', cmap=plt.cm.magma)
+plt.colorbar(label='correlation coefficient')
+tick_marks = np.arange(len(corrcoef))
+plt.xticks(tick_marks, df_stats.iloc[:, 1:7].columns, rotation=90)
+plt.yticks(tick_marks, df_stats.iloc[:, 1:7].columns)
+plt.tight_layout() #clean
+```
+![d7cb19bc-162e-485e-b2ca-c495411949e9](https://github.com/atnikola/pokemon-analysis/assets/38530617/0f9c0800-d65c-4715-99c9-39da7355297f)
+
+```python
+###----Correlations
+Base_stats = ['Primary','Secondary','Height','Weight','HP','Attack','Defense',
               'SP_Attack','SP_Defense','Speed','is_sllm']
 
 df_BS = df[Base_stats]
-df_BS.head()
+
+plt.figure(figsize=(14,12))
+
+heatmap = sns.heatmap(df_BS.corr(), vmin=-1,vmax=1, annot=True, cmap='Blues')
+
+heatmap.set_title('Correlation Base Stats Heatmap', fontdict={'fontsize':15}, pad=12)
+plt.show()
+
 ```
-![correlation_plot](https://user-images.githubusercontent.com/38530617/153744026-f4ad82be-09c4-4cc7-bbeb-36571a98e397.png)
+![f59aa5df-bdfa-4107-94a0-2699f1f48c53](https://github.com/atnikola/pokemon-analysis/assets/38530617/2057e5cd-7e69-49b7-b64a-a5abef6a7731)
+
+Some other charts showing stat correlations:
+
+![e946888c-5d0b-476a-872e-ebfe582b4957](https://github.com/atnikola/pokemon-analysis/assets/38530617/89745bb6-661f-49f6-836d-a7f4d06be3fa)
+![c96caeb7-4b7a-4906-8ae8-eceaeffd28a8](https://github.com/atnikola/pokemon-analysis/assets/38530617/36f46590-12bb-4c2b-a5d5-d502d4556cef)
+![be606f8a-ef76-494a-8239-951e78241d11](https://github.com/atnikola/pokemon-analysis/assets/38530617/00f0533e-f5ac-4dc9-b37e-594d1f85e73a)
+![863627ea-37f4-490c-8e9b-f1f60dbcbcfe](https://github.com/atnikola/pokemon-analysis/assets/38530617/95d682bd-acc1-4bbe-9d87-bf2bab006951)
+![40db912c-61c7-4d9b-9584-27c845e59fef](https://github.com/atnikola/pokemon-analysis/assets/38530617/222a7ce5-dd0e-4268-9b33-d4666d0881ae)
 
 
-![hex_green](https://user-images.githubusercontent.com/38530617/153745763-7d378c6e-efbd-4afa-a852-2fe983ffae76.png)
-![hex_blue](https://user-images.githubusercontent.com/38530617/153745765-d36af02d-afc1-4226-8586-df5301d450eb.png)
-![hex_red](https://user-images.githubusercontent.com/38530617/153745775-e0c6e828-d52b-4758-9406-ced67a9d36b6.png)
-![hex_orange](https://user-images.githubusercontent.com/38530617/153745779-f30e6bfc-8a29-4989-822c-cb604bbd0e98.png)
+
+extra:
 
 ```python
 from pandas import plotting
