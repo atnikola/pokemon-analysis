@@ -1,7 +1,7 @@
 # Pokémon Analysis
 **Andreas Nikolaidis** 
 
-_September 2023_
+_February 2022_ (_Edited:September 2023_)
 
 - [Introduction](#introduction)
 - [Exploratory Analysis](#exploratory_analysis)
